@@ -1,10 +1,10 @@
 SRCS = $(wildcard *.asm)
 
-PROGS = $(patsubst %.asm, %.bin, $(SRCS))
+PROGS = $(patsubst boot_%.asm, boot_%.bin, $(SRCS))
 
 all: $(PROGS)
 
-%.bin: %.asm
+boot_%.bin: boot_%.asm
 	nasm $< -f bin -o $@
 
 clean:
