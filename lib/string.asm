@@ -1,7 +1,3 @@
-; NOTE: In order for utilities like print_hex to work properly the calling code
-; must set [org 0x7c00], otherwise the string templates will be referenced from
-; the wrong location. (Not sure if this is "best practice" for assembly or not.)
-
 ; Print the "string" (null-terminated series of characters)
 ; that begins at the address in bx.
 print_string:
