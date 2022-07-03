@@ -1,3 +1,7 @@
+; NOTE: In order for utilities like print_hex to work properly the calling code
+; must set [org 0x7c00], otherwise the string templates will be referenced from
+; the wrong location. (Not sure if this is "best practice" for assembly or not.)
+
 ; Print the "string" (null-terminated series of characters)
 ; that begins at the address in bx.
 print_string:
@@ -13,13 +17,23 @@ print_string:
         jmp print_string_print_byte  ; Back to the beginning
 
     print_string_reached_null_terminator:
-        ; We've reached the end of the string -- print a new line (\r\n) and exit
-        mov al, 0x0d  ; 0x0d is a carriage return
-        int 0x10
-        mov al, 0x0a  ; 0x0a is a newline
-        int 0x10
         popa  ; Restore register values to their state before the "function" started
         ret  ; Return to the location stored in the instruction pointer stack (?), i.e. the point where the "call" instruction was made
+
+
+; Print a "modern" newline (i.e. a new line + carriage return)
+print_newline:
+    pusha
+    mov ah, 0x0e
+
+    mov al, 0x0d  ; 0x0d is a carriage return
+    int 0x10
+    mov al, 0x0a  ; 0x0a is a newline
+    int 0x10
+
+    popa
+    ret
+
 
 ; Prints the value of dx as a hexadecimal.
 print_hex:
@@ -69,7 +83,7 @@ print_hex:
         ; are stored at 0x61-0x66. Compare the numerical value of the character to
         ; determine if we should print a letter or a number.
         cmp cl, 0x09
-        jge print_hex_ascii_letters
+        jg print_hex_ascii_letters
 
     print_hex_ascii_numbers:  ; not referenced, just for readability
         mov al, cl

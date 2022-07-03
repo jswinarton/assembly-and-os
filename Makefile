@@ -4,11 +4,9 @@ PROGS = $(patsubst boot_%.asm, boot_%.bin, $(SRCS))
 
 all: $(PROGS)
 
-boot_string.bin: boot_string.asm print.asm
-	nasm boot_string.asm -f bin -o boot_string.bin
-
-boot_%.bin: boot_%.asm
+boot_%.bin: boot_%.asm print.asm
 	nasm $< -f bin -o $@
 
+# TODO this currently deletes print.asm. Not sure how to fix
 clean:
 	rm -rf $(PROGS)
