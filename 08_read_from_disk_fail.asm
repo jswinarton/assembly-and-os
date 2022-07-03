@@ -1,3 +1,5 @@
+; Can't get this one working for some reason. But 09 works so that's good.
+
 mov ah, 0x02  ; BIOS read sector function
 
 mov dl, 0  ; Read drive 0 (i.e. first floppy (?) drive)
