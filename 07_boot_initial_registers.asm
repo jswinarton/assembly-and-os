@@ -78,7 +78,7 @@ call print_newline
 
 jmp $
 
-%include "print.asm"
+%include "stdlib.asm"
 
 times 510-($-$$) db 0
 dw 0xaa55

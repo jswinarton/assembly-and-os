@@ -20,7 +20,7 @@ call print_hex
 
 jmp $
 
-%include "print.asm"
+%include "stdlib.asm"
 
 HELLO_MSG:
     db 'Hello, world!', 0
