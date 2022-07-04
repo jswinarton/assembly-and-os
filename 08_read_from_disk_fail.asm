@@ -1,4 +1,7 @@
-; Can't get this one working for some reason. But 09 works so that's good.
+; This was example code that doesn't work because it doesn't match up with the
+; structure of your example disk.
+; 9 works because we create a boot drive with exactly three sectors (the first
+; being the bootloader) that we can then read from directly
 
 mov ah, 0x02  ; BIOS read sector function
 
