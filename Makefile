@@ -4,7 +4,7 @@ PROGS = $(patsubst %.asm, %.bin, $(SRCS))
 
 all: $(PROGS)
 
-%.bin: %.asm lib/string.asm lib/disk.asm
+%.bin: %.asm lib/*.asm
 	nasm $< -f bin -o $@
 
 clean:
