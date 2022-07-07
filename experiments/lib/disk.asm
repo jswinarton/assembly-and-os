@@ -29,3 +29,6 @@ disk_error:
 
 DISK_ERROR_MSG:
     db "Disk read error!", 0
+
+DISK_SUCCESS_MSG:
+    db "Disk read success!", 0

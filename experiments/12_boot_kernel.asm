@@ -15,6 +15,7 @@ mov sp, bp
 ; Announce that we are starting booting from 16-bit real mode
 mov bx, MSG_REAL_MODE
 call print_string
+call print_newline
 
 call load_kernel
 
@@ -35,12 +36,13 @@ jmp $
 load_kernel:
     mov bx, MSG_LOAD_KERNEL
     call print_string
+    call print_newline
 
     ; Set up parameters for our disk load routine, so that we load the first 15
     ; sectors (excluding the boot sector) from the boot disk (i.e. our kernel
     ; code) to address KERNEL_OFFSET
     mov bx, KERNEL_OFFSET
-    mov dh, 15
+    mov dh, 8
     mov dl, [BOOT_DRIVE]
     call disk_load
 
