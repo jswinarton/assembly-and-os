@@ -24,11 +24,11 @@ call switch_to_32
 
 jmp $
 
-%include "lib/string.asm"
-%include "lib/disk.asm"
-%include "lib/gdt.asm"
-%include "lib/string_32.asm"
-%include "lib/switch_to_32.asm"
+%include "_string.asm"
+%include "_disk.asm"
+%include "_gdt.asm"
+%include "_string_32.asm"
+%include "_switch_to_32.asm"
 
 [bits 16]
 

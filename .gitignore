@@ -1,4 +1,1 @@
-*.bin
-*.iso
-*.o
-*.dis
+os/os.img

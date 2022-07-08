@@ -1,39 +1,37 @@
-# TODO make sure builds go to 32-bit mode
-
 all: os.img
 
 # TODO
 # Run QEMU to simulate a real system boot
-# run: all
+run: all
+	qemu-system-x86_64 -monitor stdio os.img
 
 # The actual disk image that the computer loads, which is the combination of the
 # compiled boot sector and kernel
-os.img: boot_sect.bin kernel.bin
-	cat $^ os.img
+os.img: boot/boot_sect.bin kernel/kernel.bin
+	cat $^ > os.img
 
 # This builds the binary of the kernel from two object files:
 #  - the kernel_entry, which jumps to main() in our kernel
 #  - the compiled C kernel
-kernel.bin: kernel_entry.o kernel.o
-	ld -o kernel.bin -Ttext 0x1000 $^ --oformat binary
+kernel/kernel.bin: kernel/kernel_entry.o kernel/kernel.o
+	ld -m elf_i386 -o kernel/kernel.bin -Ttext 0x1000 $^ --oformat binary
 
 # Build the kernel object file
-kernel.o: kernel.c
-	gcc -ffreestanding -c $< -o $@
+kernel/kernel.o: kernel/kernel.c
+	gcc -m32 -fno-pic -ffreestanding -c $< -o $@
 
 # Build the kernel entry object file
-kernel_entry.o: kernel_entry.asm
+kernel/kernel_entry.o: kernel/kernel_entry.asm
 	nasm $< -f elf -o $@
 
-# TODO
 # Assemble the boot sector to raw machine code
-# boot_sect.bin: boot_sect.asm
-# 	nasm $< -f bin -I '../../16bit/' -o $@
+boot/boot_sect.bin: boot/boot_sect.asm
+	nasm $< -f bin -I './boot' -o $@
+
+# Disassemble the kernel -- might be useful for debugging
+kernel/kernel.dis: kernel/kernel.bin
+	ndisasm -b 32 $< > $@
 
 # Clear away all generated files
 clean:
-	rm -r *.bin *.dis *.o os.img *.map
-
-# Disassemble the kernel -- might be useful for debugging
-kernel.dis: kernel.bin
-	ndisasm -b 32 $< > $@
+	rm -r **/*.bin **/*.dis **/*.o **/*.map os.img
