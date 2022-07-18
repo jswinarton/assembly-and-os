@@ -1,0 +1,5 @@
+{
+    // Set because the clang backend for clang-tidy is not compatible with our
+    // gcc cross-compiler and produces errors we can't do anything about
+    "C_Cpp.errorSquiggles": "Disabled"
+}

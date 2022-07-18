@@ -25,8 +25,8 @@ clean:
 
 .PHONY: docs
 docs:
-	echo "Build docs"
+	doxygen
 
 .PHONY: serve-docs
 serve-docs:
-	echo "Serve docs"
+	python3 -m http.server --bind 0.0.0.0 8080 --directory ./docs

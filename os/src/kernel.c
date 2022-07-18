@@ -35,6 +35,7 @@ enum vga_color
     VGA_COLOR_WHITE = 15,
 };
 
+// TODO make sure this shows up in doxygen
 /**
  * Return a uint8_t describing a fg/bg color combo.
  *
@@ -47,21 +48,27 @@ vga_entry_color(enum vga_color fg, enum vga_color bg)
     return fg | bg << 4;
 }
 
-// Return a uint16_t describing a character and the colors it should be printed
-// in. The low 8 bits represent the character, and the high 8 bits represent a
-// fg/bg color combination (see vga_entry_color for specification).
+// TODO make sure static inline methods show up in doxygen
+// TODO how to document the specification for colors?
+
+/**
+ * Return a uint16_t describing a character and its colors.
+ *
+ * The low 8 bits represent the character, and the high 8 bits represent a fg/bg
+ * color combination (see vga_entry_color for the specification).
+ */
 static inline uint16_t vga_entry(unsigned char uc, uint8_t color)
 {
     return (uint16_t)uc | (uint16_t)color << 8;
 }
 
-// TODO come back to this and analyse it
-
 /**
- * This is a test docstring
+ * Return the length of a string.
  */
 size_t strlen(const char *str)
 {
+    // This works because each char is just an int, and the null character '\0'
+    // is just the int 0. This is the only thing that evaluates to false.
     size_t len = 0;
     while (str[len])
         len++;
@@ -98,15 +105,36 @@ void terminal_setcolor(uint8_t color)
     terminal_color = color;
 }
 
+/// @brief Put a character at a specified position in the terminal.
+/// @param c The character to be rendered. This should be a printable
+/// character. (No processing is done to ensure that it isn't.)
+/// @param color The color of the character.
+/// @param x The x-coordinate of the terminal location to print at.
+/// @param y The y-coordinate of the terminal location to print at.
 void terminal_putentryat(char c, uint8_t color, size_t x, size_t y)
 {
     const size_t index = y * VGA_WIDTH + x;
     terminal_buffer[index] = vga_entry(c, color);
 }
 
+/// @brief Put a character at the position indicated by the column and row
+/// counters and advance the counters.
+/// @details If the character is a newline, no character will be printed, but
+/// the column and row counters will advance to the beginning of the next row.
+/// @param c The character to be rendered.
 void terminal_putchar(char c)
 {
+    // TODO why does this work ...
+    if (c == *"\n")
+    {
+        terminal_column = 0;
+        if (++terminal_row == VGA_HEIGHT)
+            terminal_row = 0;
+        return;
+    }
+
     terminal_putentryat(c, terminal_color, terminal_column, terminal_row);
+
     if (++terminal_column == VGA_WIDTH)
     {
         terminal_column = 0;
@@ -115,22 +143,96 @@ void terminal_putchar(char c)
     }
 }
 
-void terminal_write(const char *data, size_t size)
+void terminal_write(const char *data)
 {
-    for (size_t i = 0; i < size; i++)
-        terminal_putchar(data[i]);
+    size_t len = 0;
+    while (data[len])
+    {
+        terminal_putchar(data[len]);
+        len++;
+    }
 }
 
-void terminal_writestring(const char *data)
+int abs(int value)
 {
-    terminal_write(data, strlen(data));
+    if (value < 0)
+    {
+        return value / -1;
+    }
+    return value;
+}
+
+char *itoa(int value, char *str, int base)
+{
+    // We only support bases between 2 and 36.
+    if (base < 2 || base > 36)
+    {
+        *str = '\0';
+        return str;
+    }
+
+    // TODO this is a bad variable name
+    char *rc;
+    char *ptr;
+    char *low;
+
+    rc = ptr = str;
+
+    // Set '-' for negative decimals
+    // TODO why only for decimals?
+    if (value < 0 && base == 10)
+    {
+        // The postfix operator means the increment happens AFTER assignment.
+        // So this assigns to the memory pointed to by ptr and then increments.
+        *ptr++ = '-';
+    }
+
+    // Remember where the numbers start
+    // TODO document this better
+    low = ptr;
+
+    // The main conversion routine
+    // Divide the value by the base. The remainder (modulo) is the last digit.
+    // Feed the quotient back into the algorithm and repeat to get each digit.
+    // Since this works backwards, we will need to reverse the order of the
+    // digits at the end.
+    do
+    {
+        *ptr++ = "0123456789abcdefghijklmnopqrstuvwxyz"[abs(value % base)];
+        value /= base;
+    } while (value);
+
+    // Terminate the string
+    // Decrement the pointer so that it points at the last character in the
+    // string, so that we can do the reversal properly
+    // Remember that postfix operator means decrement happens after assignment
+    *ptr-- = '\0';
+
+    // Reverse the numbers
+    // TODO there is probably a better way to do this.
+    // See http://www.strudel.org.uk/itoa/
+    // You could create some kind of buffer of a set size and add the digits in
+    // backwards, then produce a null-terminated string from this
+    while (low < ptr)
+    {
+        char tmp = *low;
+        *low++ = *ptr;
+        *ptr-- = tmp;
+    }
+
+    return rc;
 }
 
 void kernel_main(void)
 {
-    // Initialize terminal interface
     terminal_initialize();
 
-    // Newline support is left as an exercise.
-    terminal_writestring("Hello, kernel world!\n");
+    char *itoastr = "";
+    for (size_t i = 0; i <= 30; i++)
+    {
+        itoa(i, itoastr, 10);
+        terminal_write("Line ");
+        terminal_write(itoastr);
+        terminal_write("\n");
+    }
 }
