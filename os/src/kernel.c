@@ -1,3 +1,5 @@
+/** @file kernel.c */
+
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -33,8 +35,12 @@ enum vga_color
     VGA_COLOR_WHITE = 15,
 };
 
-// Return a uint8_t describing a fg/bg color combo. The low 4 bits represent
-// the foreground color and the high four bits represent the background color
+/**
+ * Return a uint8_t describing a fg/bg color combo.
+ *
+ * The low 4 bits represent the foreground color and the high four bits
+ * represent the background color
+ */
 static inline uint8_t
 vga_entry_color(enum vga_color fg, enum vga_color bg)
 {
@@ -50,6 +56,10 @@ static inline uint16_t vga_entry(unsigned char uc, uint8_t color)
 }
 
 // TODO come back to this and analyse it
+
+/**
+ * This is a test docstring
+ */
 size_t strlen(const char *str)
 {
     size_t len = 0;
